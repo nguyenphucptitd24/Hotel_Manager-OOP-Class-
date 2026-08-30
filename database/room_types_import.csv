@@ -1,0 +1,8 @@
+id,name,base_price,capacity,description
+1,Room_Type 1,95.92,2,Room_Type 1 - Tiêu chuẩn khách sạn quốc tế
+2,Room_Type 2,87.85,2,Room_Type 2 - Tiêu chuẩn khách sạn quốc tế
+3,Room_Type 3,73.68,2,Room_Type 3 - Tiêu chuẩn khách sạn quốc tế
+4,Room_Type 4,125.29,3,Room_Type 4 - Tiêu chuẩn khách sạn quốc tế
+5,Room_Type 5,123.73,3,Room_Type 5 - Tiêu chuẩn khách sạn quốc tế
+6,Room_Type 6,182.21,4,Room_Type 6 - Tiêu chuẩn khách sạn quốc tế
+7,Room_Type 7,155.2,4,Room_Type 7 - Tiêu chuẩn khách sạn quốc tế
