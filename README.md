@@ -33,5 +33,5 @@ spring.jpa.hibernate.ddl-auto=validate
 
 ## 4. Dữ liệu Master có sẵn
 
-- **Tài khoản mặc định:** `admin` / `admin123` (Role: `ROLE_ADMIN`)
+- **Tài khoản mặc định:** `admin` / `admin123` (Role: `ROLE_ADMIN`), `staff01` / `123456` (Role: `ROLE_STAFF`)
 - **Tổng số bản ghi:** 7 loại phòng, 70 phòng, 36.275 khách hàng và đơn đặt phòng.
