@@ -1,0 +1,123 @@
+package Hotel_Manager_OOP_Class_.demo.service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
+import Hotel_Manager_OOP_Class_.demo.dto.RoomResponse;
+import Hotel_Manager_OOP_Class_.demo.entity.Room;
+import Hotel_Manager_OOP_Class_.demo.repository.RoomRepository;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class RoomService {
+    private final RoomRepository roomRepository;
+    public List<RoomResponse> searchRooms(
+        String roomNumber,
+        Integer floor,
+        String status,
+        Integer roomTypeId) {
+        return roomRepository.searchRooms(
+                roomNumber,
+                floor,
+                status,
+                roomTypeId
+        )
+        .stream()
+        .map(this::toResponse)
+        .collect(Collectors.toList());
+    }
+    private RoomResponse toResponse(Room room) {
+        return new RoomResponse(
+                room.getId(),
+                room.getRoomNumber(),
+                room.getFloor(),
+                room.getStatus(),
+                room.getRoomType().getId(),
+                room.getRoomType().getName(),
+                room.getRoomType().getBasePrice()
+        );
+    }
+    public RoomResponse getRoomById(Integer id) {
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy phòng"));
+        return new RoomResponse(
+                room.getId(),
+                room.getRoomNumber(),
+                room.getFloor(),
+                room.getStatus(),
+                room.getRoomType().getId(),
+                room.getRoomType().getName(),
+                room.getRoomType().getBasePrice()
+        );
+    }
+    public RoomResponse createRoom(Room room) {
+        Room savedRoom = roomRepository.save(room);
+        return new RoomResponse(
+                savedRoom.getId(),
+                savedRoom.getRoomNumber(),
+                savedRoom.getFloor(),
+                savedRoom.getStatus(),
+                savedRoom.getRoomType().getId(),
+                savedRoom.getRoomType().getName(),
+                savedRoom.getRoomType().getBasePrice()
+        );
+    }
+    public RoomResponse updateRoom(Integer id, Room room) {
+        Room existingRoom = roomRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Không tìm thấy phòng"));
+
+        existingRoom.setRoomNumber(room.getRoomNumber());
+        existingRoom.setFloor(room.getFloor());
+        existingRoom.setStatus(room.getStatus());
+        existingRoom.setRoomType(room.getRoomType());
+
+        Room updatedRoom = roomRepository.save(existingRoom);
+        return new RoomResponse(
+            updatedRoom.getId(),
+            updatedRoom.getRoomNumber(),
+            updatedRoom.getFloor(),
+            updatedRoom.getStatus(),
+            updatedRoom.getRoomType().getId(),
+            updatedRoom.getRoomType().getName(),
+            updatedRoom.getRoomType().getBasePrice()
+        );
+    }
+    public void deleteRoom(Integer id) {
+        if (!roomRepository.existsById(id)) {
+            throw new RuntimeException("Không tìm thấy phòng");
+        }
+
+        roomRepository.deleteById(id);
+    }
+    public RoomResponse updateRoomStatus(Integer id, String status) {
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy phòng"));
+        String currentStatus = room.getStatus();
+        boolean valid = switch (currentStatus) {
+            case "AVAILABLE" -> status.equals("OCCUPIED");
+            case "OCCUPIED" -> status.equals("CLEANING");
+            case "CLEANING" -> status.equals("AVAILABLE");
+            default -> false;
+        };
+        if (!valid) {
+            throw new RuntimeException(
+                    "Không thể chuyển trạng thái từ "
+                    + currentStatus + " sang " + status
+            );
+        }
+        room.setStatus(status);
+        Room updatedRoom = roomRepository.save(room);
+        return new RoomResponse(
+                updatedRoom.getId(),
+                updatedRoom.getRoomNumber(),
+                updatedRoom.getFloor(),
+                updatedRoom.getStatus(),
+                updatedRoom.getRoomType().getId(),
+                updatedRoom.getRoomType().getName(),
+                updatedRoom.getRoomType().getBasePrice()
+        );
+    }
+}

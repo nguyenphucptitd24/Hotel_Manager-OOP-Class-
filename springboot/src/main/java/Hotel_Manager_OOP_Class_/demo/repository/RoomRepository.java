@@ -31,4 +31,17 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
             """, nativeQuery = true)
     List<Room> findAvailableRooms(@Param("checkIn") String checkIn,
                                  @Param("checkOut") String checkOut);
+    @Query("""
+        SELECT r FROM Room r
+        WHERE (:roomNumber IS NULL OR r.roomNumber = :roomNumber)
+        AND (:floor IS NULL OR r.floor = :floor)
+        AND (:status IS NULL OR r.status = :status)
+        AND (:roomTypeId IS NULL OR r.roomType.id = :roomTypeId)
+    """)
+    List<Room> searchRooms(
+            @Param("roomNumber") String roomNumber,
+            @Param("floor") Integer floor,
+            @Param("status") String status,
+            @Param("roomTypeId") Integer roomTypeId
+    );
 }
