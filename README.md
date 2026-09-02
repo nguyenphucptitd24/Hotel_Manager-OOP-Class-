@@ -3,7 +3,7 @@
 Yêu cầu 2 terminal
 cd hotel-frontend
 ```bash
-"npm run dev
+npm run dev
 ```
 cd springboot 
 ```bash
