@@ -1,5 +1,14 @@
 # Hotel Management Database & Docker Setup
-
+## Khởi chạy 
+Yêu cầu 2 terminal
+cd hotel-frontend
+```bash
+"npm run dev
+```
+cd springboot 
+```bash
+./mvnw spring-boot:run 
+```
 ## 1. Khởi chạy Database bằng Docker
 
 Yêu cầu: Đã cài đặt Docker Desktop.
