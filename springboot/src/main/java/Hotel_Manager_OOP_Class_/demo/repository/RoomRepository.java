@@ -13,6 +13,13 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
 
     List<Room> findByRoomNumber(String roomNumber);
 
+    boolean existsByRoomNumber(String roomNumber);
+
+    boolean existsByRoomNumberAndIdNot(String roomNumber, Integer id);
+
+    @Query("SELECT COALESCE(MAX(r.id), 0) + 1 FROM Room r")
+    Integer findNextId();
+
     List<Room> findByStatus(String status);
 
     List<Room> findByFloor(Integer floor);

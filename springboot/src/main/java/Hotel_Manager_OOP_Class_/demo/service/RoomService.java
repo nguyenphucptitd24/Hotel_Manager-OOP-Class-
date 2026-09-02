@@ -9,6 +9,7 @@ import Hotel_Manager_OOP_Class_.demo.dto.RoomResponse;
 import Hotel_Manager_OOP_Class_.demo.entity.Room;
 import Hotel_Manager_OOP_Class_.demo.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -53,21 +54,28 @@ public class RoomService {
                 room.getRoomType().getBasePrice()
         );
     }
+    @Transactional
     public RoomResponse createRoom(Room room) {
+        if (roomRepository.existsByRoomNumber(room.getRoomNumber())) {
+            throw new RuntimeException("Số phòng đã tồn tại");
+        }
+
+        if (room.getId() == null) {
+            room.setId(roomRepository.findNextId());
+        }
+
         Room savedRoom = roomRepository.save(room);
-        return new RoomResponse(
-                savedRoom.getId(),
-                savedRoom.getRoomNumber(),
-                savedRoom.getFloor(),
-                savedRoom.getStatus(),
-                savedRoom.getRoomType().getId(),
-                savedRoom.getRoomType().getName(),
-                savedRoom.getRoomType().getBasePrice()
-        );
+        return toResponse(savedRoom);
     }
+
+    @Transactional
     public RoomResponse updateRoom(Integer id, Room room) {
         Room existingRoom = roomRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Không tìm thấy phòng"));
+
+        if (roomRepository.existsByRoomNumberAndIdNot(room.getRoomNumber(), id)) {
+            throw new RuntimeException("Số phòng đã tồn tại");
+        }
 
         existingRoom.setRoomNumber(room.getRoomNumber());
         existingRoom.setFloor(room.getFloor());
@@ -75,15 +83,7 @@ public class RoomService {
         existingRoom.setRoomType(room.getRoomType());
 
         Room updatedRoom = roomRepository.save(existingRoom);
-        return new RoomResponse(
-            updatedRoom.getId(),
-            updatedRoom.getRoomNumber(),
-            updatedRoom.getFloor(),
-            updatedRoom.getStatus(),
-            updatedRoom.getRoomType().getId(),
-            updatedRoom.getRoomType().getName(),
-            updatedRoom.getRoomType().getBasePrice()
-        );
+        return toResponse(updatedRoom);
     }
     public void deleteRoom(Integer id) {
         if (!roomRepository.existsById(id)) {

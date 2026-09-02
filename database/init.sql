@@ -96,7 +96,9 @@ GO
 -- ==========================================================
 INSERT INTO roles (name) VALUES ('ROLE_ADMIN'), ('ROLE_STAFF');
 INSERT INTO users (username, password_hash, full_name, role_id) 
-VALUES ('admin', 'admin123', N'Quản Trị Viên', 1);
+VALUES 
+('admin', '$2a$10$3A2N8.0ty4oxzYRiK5YvD.MaCy138PwRIPqlSAdssKOKMeeVeWQIq', N'Quản Trị Viên', 1),
+('staff01', '$2a$10$6ZPFcpVmI8ZnbU64oAazKevZyVqQNpVWwouKk6IJ1HyGMbxlEsjsW', N'Nhân Viên 01', 2);
 GO
 
 -- ==========================================================
@@ -106,6 +108,7 @@ BULK INSERT room_types
 FROM '/data/room_types_import.csv'
 WITH (
     FORMAT = 'CSV',
+    CODEPAGE = '65001',
     FIRSTROW = 2,
     FIELDTERMINATOR = ',',
     ROWTERMINATOR = '0x0a',
@@ -116,6 +119,7 @@ BULK INSERT rooms
 FROM '/data/rooms_import.csv'
 WITH (
     FORMAT = 'CSV',
+    CODEPAGE = '65001',
     FIRSTROW = 2,
     FIELDTERMINATOR = ',',
     ROWTERMINATOR = '0x0a',
@@ -126,6 +130,7 @@ BULK INSERT customers
 FROM '/data/customers_import.csv'
 WITH (
     FORMAT = 'CSV',
+    CODEPAGE = '65001',
     FIRSTROW = 2,
     FIELDTERMINATOR = ',',
     ROWTERMINATOR = '0x0a',
@@ -136,6 +141,7 @@ BULK INSERT bookings
 FROM '/data/bookings_import.csv'
 WITH (
     FORMAT = 'CSV',
+    CODEPAGE = '65001',
     FIRSTROW = 2,
     FIELDTERMINATOR = ',',
     ROWTERMINATOR = '0x0a',
@@ -146,6 +152,7 @@ BULK INSERT booking_details
 FROM '/data/booking_details_import.csv'
 WITH (
     FORMAT = 'CSV',
+    CODEPAGE = '65001',
     FIRSTROW = 2,
     FIELDTERMINATOR = ',',
     ROWTERMINATOR = '0x0a',

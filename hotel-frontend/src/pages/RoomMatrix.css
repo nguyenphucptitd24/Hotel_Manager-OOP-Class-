@@ -1,0 +1,187 @@
+.room-page {
+    padding: 25px 30px;
+}
+
+.room-page h1 {
+    margin-bottom: 25px;
+}
+
+/* Bộ lọc */
+.filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.filters select,
+.filters button {
+    padding: 10px 14px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.filters button {
+    cursor: pointer;
+}
+
+/* Chú thích trạng thái */
+.legend {
+    display: flex;
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legend-box {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+}
+
+/* Tầng */
+.floor {
+    margin-bottom: 35px;
+}
+
+.floor h2 {
+    margin-bottom: 15px;
+}
+
+/* Các phòng */
+.room-grid {
+    display: grid;
+    grid-template-columns: repeat(10, minmax(80px, 1fr));
+    gap: 12px;
+}
+
+.room-card {
+    min-height: 85px;
+    border-radius: 10px;
+    padding: 10px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    border: 2px solid #ddd;
+
+    cursor: pointer;
+
+    transition: transform 0.15s;
+}
+
+.room-card:hover {
+    transform: scale(1.04);
+}
+
+.room-card strong {
+    font-size: 20px;
+}
+
+.room-card span {
+    font-size: 12px;
+    margin-top: 6px;
+}
+
+/* Trạng thái */
+.available {
+    background-color: #c8f7c5;
+}
+
+.occupied {
+    background-color: #ffb3b3;
+}
+
+.cleaning {
+    background-color: #ffe49c;
+}
+
+/* Chi tiết phòng */
+.room-detail {
+    margin-top: 30px;
+    padding: 20px;
+
+    border: 1px solid #ccc;
+    border-radius: 10px;
+
+    max-width: 400px;
+}
+
+.room-detail p {
+    margin: 10px 0;
+}
+
+.room-detail button {
+    padding: 9px 15px;
+    margin-right: 8px;
+
+    border-radius: 6px;
+    border: 1px solid #ccc;
+
+    cursor: pointer;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 15px 30px;
+
+    border-bottom: 1px solid #ccc;
+}
+
+.header h2 {
+    margin: 0;
+}
+
+.header button {
+    padding: 8px 15px;
+
+    cursor: pointer;
+
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.header-actions button.active {
+    color: #0f172a;
+    background: #dbeafe;
+    border-color: #93c5fd;
+}
+
+/* Màn hình nhỏ */
+@media (max-width: 900px) {
+    .room-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .room-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .room-page {
+        padding: 15px;
+    }
+
+    .legend {
+        flex-wrap: wrap;
+    }
+}
