@@ -1,10 +1,13 @@
 package com.hotel.service.impl;
 
-import com.hotel.dto.*;
+import com.hotel.dto.BookingResponseDTO;
+import com.hotel.dto.CreateBookingRequest;
+import com.hotel.dto.RoomDTO;
 import com.hotel.entity.*;
 import com.hotel.exception.BadRequestException;
 import com.hotel.exception.ResourceNotFoundException;
 import com.hotel.mapper.BookingMapper;
+import com.hotel.mapper.RoomMapper;
 import com.hotel.repository.*;
 import com.hotel.service.BookingService;
 import lombok.RequiredArgsConstructor;
@@ -21,40 +24,48 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
 
-    private final RoomRepository roomRepository; // Của Thành viên 1
-    private final CustomerRepository customerRepository; // Của Thành viên 3
+    private final RoomRepository roomRepository; 
+    private final CustomerRepository customerRepository; 
     private final BookingRepository bookingRepository; 
     private final BookingDetailRepository bookingDetailRepository;
 
+    // --- CÔNG VIỆC 1: Lọc phòng trống ---
     @Override
     public List<RoomDTO> getAvailableRooms(LocalDateTime checkIn, LocalDateTime checkOut, Long roomTypeId) {
-        // ... (Code của Công việc 1 đã paste trước đó) ...
-        return List.of();
+        if (checkIn == null || checkOut == null) {
+            throw new BadRequestException("Ngày nhận và trả phòng không được để trống!");
+        }
+
+        if (checkIn.isAfter(checkOut) || checkIn.isEqual(checkOut)) {
+            throw new BadRequestException("Ngày nhận phòng phải trước ngày trả phòng!");
+        }
+
+        List<Room> availableRooms = roomRepository.findAvailableRooms(checkIn, checkOut, roomTypeId);
+
+        return availableRooms.stream()
+                .map(RoomMapper::toDto)
+                .toList();
     }
 
+    // --- CÔNG VIỆC 2: Tạo đơn đặt phòng ---
     @Override
-    @Transactional // Đảm bảo nếu lưu lỗi ở bất kỳ bước nào thì DB sẽ Rollback hoàn toàn
+    @Transactional
     public BookingResponseDTO createBooking(CreateBookingRequest request) {
-        
-        // 1. Kiểm tra Khách hàng
         Customer customer = customerRepository.findById(request.getCustomerId())
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy thông tin khách hàng!"));
 
-        // 2. Validate danh sách phòng
         if (request.getRoomIds() == null || request.getRoomIds().isEmpty()) {
             throw new BadRequestException("Phải chọn ít nhất 1 phòng để đặt!");
         }
 
-        // 3. Lấy danh sách các phòng từ CSDL & kiểm tra phòng tồn tại
         List<Room> selectedRooms = roomRepository.findAllById(request.getRoomIds());
         if (selectedRooms.size() != request.getRoomIds().size()) {
-            throw new BadRequestException("Một hoặc nhiều phòng chọn không tồn tại trong hệ thống!");
+            throw new BadRequestException("Một hoặc nhiều phòng chọn không tồn tại!");
         }
 
-        // 4. Tính toán số đêm ở và tổng tiền phòng
         long numberOfNights = Duration.between(request.getCheckInExpected(), request.getCheckOutExpected()).toDays();
         if (numberOfNights <= 0) {
-            numberOfNights = 1; // Tính tối thiểu 1 đêm
+            numberOfNights = 1;
         }
 
         double totalRoomPrice = 0.0;
@@ -62,13 +73,9 @@ public class BookingServiceImpl implements BookingService {
             totalRoomPrice += room.getPrice() * numberOfNights;
         }
 
-        // Tính tiền cọc 30%
         double totalDeposit = totalRoomPrice * 0.30;
-
-        // 5. Sinh mã Đặt phòng tự động (Ví dụ: BK-20260907-A1B2)
         String bookingCode = "BK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
-        // 6. Lưu vào bảng chính (bookings)
         Booking booking = new Booking();
         booking.setBookingCode(bookingCode);
         booking.setCustomer(customer);
@@ -77,22 +84,43 @@ public class BookingServiceImpl implements BookingService {
         booking.setTotalPrice(totalRoomPrice);
         booking.setTotalDeposit(totalDeposit);
         booking.setStatus(BookingStatus.CONFIRMED);
-        booking.setNote(request.getNote());
 
         Booking savedBooking = bookingRepository.save(booking);
 
-        // 7. Lưu vào bảng chi tiết (booking_details - tương ứng file CSV của dự án)
         List<BookingDetail> details = new ArrayList<>();
         for (Room room : selectedRooms) {
             BookingDetail detail = new BookingDetail();
             detail.setBooking(savedBooking);
             detail.setRoom(room);
-            detail.setPrice(room.getPrice()); // Lưu giá phòng tại thời điểm đặt
+            detail.setPrice(room.getPrice());
             details.add(detail);
         }
         bookingDetailRepository.saveAll(details);
 
-        // 8. Trả về thông tin đặt phòng hoàn tất
         return BookingMapper.toResponseDto(savedBooking, details);
+    }
+
+    // --- CÔNG VIỆC 3: Hủy đơn đặt phòng ---
+    @Override
+    @Transactional
+    public void cancelBooking(Long bookingId, String cancelReason) {
+        // 1. Kiểm tra đơn đặt phòng có tồn tại không
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn đặt phòng có ID: " + bookingId));
+
+        // 2. Kiểm tra điều kiện trạng thái (Không cho hủy nếu đã Check-in hoặc Hoàn thành)
+        if (booking.getStatus() == BookingStatus.CHECKED_IN || booking.getStatus() == BookingStatus.COMPLETED) {
+            throw new BadRequestException("Không thể hủy đơn đặt phòng đã nhận phòng hoặc đã hoàn thành!");
+        }
+
+        if (booking.getStatus() == BookingStatus.CANCELED) {
+            throw new BadRequestException("Đơn đặt phòng này đã bị hủy trước đó!");
+        }
+
+        // 3. Cập nhật trạng thái CANCELED và lý do hủy
+        booking.setStatus(BookingStatus.CANCELED);
+        booking.setNote(cancelReason != null ? "Lý do hủy: " + cancelReason : "Khách hàng yêu cầu hủy");
+
+        bookingRepository.save(booking);
     }
 }
