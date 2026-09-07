@@ -1,4 +1,6 @@
 package com.hotel.service.impl;
+package com.hotel.service;
+
 
 import com.hotel.dto.RoomDTO;
 import com.hotel.entity.Room;
@@ -11,6 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import com.hotel.dto.BookingResponseDTO;
+import com.hotel.dto.CreateBookingRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -39,4 +44,15 @@ public class BookingServiceImpl implements BookingService {
                 .map(RoomMapper::toDto)
                 .toList();
     }
+}
+
+
+
+
+public interface BookingService {
+    // Công việc 1
+    List<RoomDTO> getAvailableRooms(LocalDateTime checkIn, LocalDateTime checkOut, Long roomTypeId);
+
+    // Công việc 2
+    BookingResponseDTO createBooking(CreateBookingRequest request);
 }
