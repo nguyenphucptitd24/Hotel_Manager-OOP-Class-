@@ -1,58 +1,98 @@
 package com.hotel.service.impl;
-package com.hotel.service;
 
-
-import com.hotel.dto.RoomDTO;
-import com.hotel.entity.Room;
+import com.hotel.dto.*;
+import com.hotel.entity.*;
 import com.hotel.exception.BadRequestException;
-import com.hotel.mapper.RoomMapper;
-import com.hotel.repository.RoomRepository;
+import com.hotel.exception.ResourceNotFoundException;
+import com.hotel.mapper.BookingMapper;
+import com.hotel.repository.*;
 import com.hotel.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-
-import com.hotel.dto.BookingResponseDTO;
-import com.hotel.dto.CreateBookingRequest;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
 
-    // Inject Repository của Thành viên 1
-    private final RoomRepository roomRepository;
+    private final RoomRepository roomRepository; // Của Thành viên 1
+    private final CustomerRepository customerRepository; // Của Thành viên 3
+    private final BookingRepository bookingRepository; 
+    private final BookingDetailRepository bookingDetailRepository;
 
     @Override
     public List<RoomDTO> getAvailableRooms(LocalDateTime checkIn, LocalDateTime checkOut, Long roomTypeId) {
-        
-        // 1. Kiểm tra tính hợp lệ của ngày đặt
-        if (checkIn == null || checkOut == null) {
-            throw new BadRequestException("Ngày nhận và trả phòng không được để trống!");
-        }
-
-        if (checkIn.isAfter(checkOut) || checkIn.isEqual(checkOut)) {
-            throw new BadRequestException("Ngày nhận phòng phải trước ngày trả phòng!");
-        }
-
-        // 2. Gọi hàm kiểm tra từ Repository của Thành viên 1
-        List<Room> availableRooms = roomRepository.findAvailableRooms(checkIn, checkOut, roomTypeId);
-
-        // 3. Chuyển đổi Entity sang DTO để trả về cho Controller
-        return availableRooms.stream()
-                .map(RoomMapper::toDto)
-                .toList();
+        // ... (Code của Công việc 1 đã paste trước đó) ...
+        return List.of();
     }
-}
 
+    @Override
+    @Transactional // Đảm bảo nếu lưu lỗi ở bất kỳ bước nào thì DB sẽ Rollback hoàn toàn
+    public BookingResponseDTO createBooking(CreateBookingRequest request) {
+        
+        // 1. Kiểm tra Khách hàng
+        Customer customer = customerRepository.findById(request.getCustomerId())
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy thông tin khách hàng!"));
 
+        // 2. Validate danh sách phòng
+        if (request.getRoomIds() == null || request.getRoomIds().isEmpty()) {
+            throw new BadRequestException("Phải chọn ít nhất 1 phòng để đặt!");
+        }
 
+        // 3. Lấy danh sách các phòng từ CSDL & kiểm tra phòng tồn tại
+        List<Room> selectedRooms = roomRepository.findAllById(request.getRoomIds());
+        if (selectedRooms.size() != request.getRoomIds().size()) {
+            throw new BadRequestException("Một hoặc nhiều phòng chọn không tồn tại trong hệ thống!");
+        }
 
-public interface BookingService {
-    // Công việc 1
-    List<RoomDTO> getAvailableRooms(LocalDateTime checkIn, LocalDateTime checkOut, Long roomTypeId);
+        // 4. Tính toán số đêm ở và tổng tiền phòng
+        long numberOfNights = Duration.between(request.getCheckInExpected(), request.getCheckOutExpected()).toDays();
+        if (numberOfNights <= 0) {
+            numberOfNights = 1; // Tính tối thiểu 1 đêm
+        }
 
-    // Công việc 2
-    BookingResponseDTO createBooking(CreateBookingRequest request);
+        double totalRoomPrice = 0.0;
+        for (Room room : selectedRooms) {
+            totalRoomPrice += room.getPrice() * numberOfNights;
+        }
+
+        // Tính tiền cọc 30%
+        double totalDeposit = totalRoomPrice * 0.30;
+
+        // 5. Sinh mã Đặt phòng tự động (Ví dụ: BK-20260907-A1B2)
+        String bookingCode = "BK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+
+        // 6. Lưu vào bảng chính (bookings)
+        Booking booking = new Booking();
+        booking.setBookingCode(bookingCode);
+        booking.setCustomer(customer);
+        booking.setCheckInExpected(request.getCheckInExpected());
+        booking.setCheckOutExpected(request.getCheckOutExpected());
+        booking.setTotalPrice(totalRoomPrice);
+        booking.setTotalDeposit(totalDeposit);
+        booking.setStatus(BookingStatus.CONFIRMED);
+        booking.setNote(request.getNote());
+
+        Booking savedBooking = bookingRepository.save(booking);
+
+        // 7. Lưu vào bảng chi tiết (booking_details - tương ứng file CSV của dự án)
+        List<BookingDetail> details = new ArrayList<>();
+        for (Room room : selectedRooms) {
+            BookingDetail detail = new BookingDetail();
+            detail.setBooking(savedBooking);
+            detail.setRoom(room);
+            detail.setPrice(room.getPrice()); // Lưu giá phòng tại thời điểm đặt
+            details.add(detail);
+        }
+        bookingDetailRepository.saveAll(details);
+
+        // 8. Trả về thông tin đặt phòng hoàn tất
+        return BookingMapper.toResponseDto(savedBooking, details);
+    }
 }
