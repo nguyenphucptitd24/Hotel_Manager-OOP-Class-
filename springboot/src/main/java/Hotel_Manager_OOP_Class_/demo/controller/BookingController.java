@@ -31,10 +31,20 @@ public class BookingController {
         return ResponseEntity.ok(rooms);
     }
 
-    // API Công việc 2: Tạo mới đơn đặt phòng
+    // API Công việc 2: Tạo đơn đặt phòng
     @PostMapping
     public ResponseEntity<BookingResponseDTO> createBooking(@RequestBody CreateBookingRequest request) {
         BookingResponseDTO response = bookingService.createBooking(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    // API Công việc 3: Hủy đơn đặt phòng
+    @PutMapping("/{id}/cancel")
+    public ResponseEntity<String> cancelBooking(
+            @PathVariable("id") Long id,
+            @RequestParam(value = "reason", required = false) String reason) {
+        
+        bookingService.cancelBooking(id, reason);
+        return ResponseEntity.ok("Hủy đơn đặt phòng thành công!");
     }
 }
