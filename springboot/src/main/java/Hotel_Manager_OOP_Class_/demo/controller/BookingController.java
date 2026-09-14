@@ -1,9 +1,9 @@
-package com.hotel.controller;
+package Hotel_Manager_OOP_Class_.demo.controller;
 
-import com.hotel.dto.BookingResponseDTO;
-import com.hotel.dto.CreateBookingRequest;
-import com.hotel.dto.RoomDTO;
-import com.hotel.service.BookingService;
+import Hotel_Manager_OOP_Class_.demo.dto.BookingResponseDTO;
+import Hotel_Manager_OOP_Class_.demo.dto.CreateBookingRequest;
+import Hotel_Manager_OOP_Class_.demo.dto.RoomDTO;
+import Hotel_Manager_OOP_Class_.demo.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -20,30 +20,27 @@ public class BookingController {
 
     private final BookingService bookingService;
 
-    // API Công việc 1: Lọc phòng trống
     @GetMapping("/available-rooms")
     public ResponseEntity<List<RoomDTO>> getAvailableRooms(
             @RequestParam("checkIn") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime checkIn,
             @RequestParam("checkOut") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime checkOut,
-            @RequestParam(value = "roomTypeId", required = false) Long roomTypeId) {
-        
+            @RequestParam(value = "roomTypeId", required = false) Integer roomTypeId) {
+
         List<RoomDTO> rooms = bookingService.getAvailableRooms(checkIn, checkOut, roomTypeId);
         return ResponseEntity.ok(rooms);
     }
 
-    // API Công việc 2: Tạo đơn đặt phòng
     @PostMapping
     public ResponseEntity<BookingResponseDTO> createBooking(@RequestBody CreateBookingRequest request) {
         BookingResponseDTO response = bookingService.createBooking(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // API Công việc 3: Hủy đơn đặt phòng
     @PutMapping("/{id}/cancel")
     public ResponseEntity<String> cancelBooking(
-            @PathVariable("id") Long id,
+            @PathVariable("id") Integer id,
             @RequestParam(value = "reason", required = false) String reason) {
-        
+
         bookingService.cancelBooking(id, reason);
         return ResponseEntity.ok("Hủy đơn đặt phòng thành công!");
     }

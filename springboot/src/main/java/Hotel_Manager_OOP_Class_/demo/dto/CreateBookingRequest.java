@@ -1,14 +1,15 @@
-package com.hotel.dto;
+package Hotel_Manager_OOP_Class_.demo.dto;
 
-import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import lombok.Data;
+
 @Data
 public class CreateBookingRequest {
-    private Long customerId;
+    private Integer customerId;
     private LocalDateTime checkInExpected;
     private LocalDateTime checkOutExpected;
-    private List<Long> roomIds; // Danh sách các id phòng khách chọn
+    private List<Integer> roomIds;
     private String note;
 }
