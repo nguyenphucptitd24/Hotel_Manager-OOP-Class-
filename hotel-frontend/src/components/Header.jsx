@@ -1,4 +1,4 @@
-function Header({ activeView, isAdmin, onChangeView, onLogout }) {
+function Header({ activeView, isAdmin, isStaff, onChangeView, onLogout }) {
     const handleLogout = () => {
         localStorage.removeItem("token");
         onLogout();
@@ -22,6 +22,15 @@ function Header({ activeView, isAdmin, onChangeView, onLogout }) {
                         onClick={() => onChangeView("room-types")}
                     >
                         Loại phòng
+                    </button>
+                )}
+
+                {(isAdmin || isStaff) && (
+                    <button
+                        className={activeView === "customers" ? "active" : ""}
+                        onClick={() => onChangeView("customers")}
+                    >
+                        Khách hàng
                     </button>
                 )}
 

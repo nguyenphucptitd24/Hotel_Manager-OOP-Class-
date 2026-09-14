@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import api from '../services/api';
 import './CustomerManagement.css';
 
@@ -30,7 +30,7 @@ function CustomerManagement() {
   // =========================
   // LOAD CUSTOMERS
   // =========================
-  const loadCustomers = async () => {
+  const loadCustomers = useCallback(async () => {
     setCustomerLoading(true);
     setCustomerError('');
 
@@ -56,12 +56,14 @@ function CustomerManagement() {
     } finally {
       setCustomerLoading(false);
     }
-  };
+  }, [customerPage, keyword]);
 
   // Load customers khi page hoặc keyword thay đổi
   useEffect(() => {
+    // This effect synchronizes the table with the API query state.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadCustomers();
-  }, [customerPage, keyword]);
+  }, [loadCustomers]);
 
   // =========================
   // SEARCH

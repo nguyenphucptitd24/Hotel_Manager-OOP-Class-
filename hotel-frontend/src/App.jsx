@@ -2,6 +2,7 @@ import { useState } from "react";
 import Login from "./pages/Login";
 import RoomMatrix from "./pages/RoomMatrix";
 import RoomTypeManager from "./pages/RoomTypeManager";
+import CustomerManagement from "./pages/CustomerManagement";
 import Header from "./components/Header";
 
 function decodeJwtPayload(token) {
@@ -49,12 +50,14 @@ function App() {
 
     const role = getCurrentUserRole();
     const isAdmin = role === "ADMIN";
+    const isStaff = role === "STAFF";
 
     return (
         <>
             <Header
                 activeView={activeView}
                 isAdmin={isAdmin}
+                isStaff={isStaff}
                 onChangeView={setActiveView}
                 onLogout={() => {
                     setActiveView("rooms");
@@ -64,6 +67,8 @@ function App() {
 
             {activeView === "room-types" && isAdmin ? (
                 <RoomTypeManager />
+            ) : activeView === "customers" && (isAdmin || isStaff) ? (
+                <CustomerManagement />
             ) : (
                 <RoomMatrix role={role} />
             )}
