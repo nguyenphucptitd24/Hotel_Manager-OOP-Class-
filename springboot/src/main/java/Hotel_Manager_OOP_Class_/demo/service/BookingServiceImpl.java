@@ -129,7 +129,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
    @Override
-    @Transactional
+   @Transactional
     public void cancelBooking(Integer bookingId, String cancelReason) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn đặt phòng có ID: " + bookingId));
@@ -154,4 +154,28 @@ public class BookingServiceImpl implements BookingService {
                 roomRepository.save(room);
             }
         }
+    }
+
+        private RoomDTO toRoomDto(Room room) {
+        return RoomDTO.builder()
+                .id(room.getId())
+                .roomNumber(room.getRoomNumber())
+                .floor(room.getFloor())
+                .status(room.getStatus())
+                .roomTypeId(
+                        room.getRoomType() != null
+                                ? room.getRoomType().getId()
+                                : null
+                )
+                .roomTypeName(
+                        room.getRoomType() != null
+                                ? room.getRoomType().getName()
+                                : null
+                )
+                .basePrice(
+                        room.getRoomType() != null
+                                ? room.getRoomType().getBasePrice()
+                                : null
+                )
+                .build();
     }
