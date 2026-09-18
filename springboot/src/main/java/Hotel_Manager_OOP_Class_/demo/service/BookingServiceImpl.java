@@ -128,7 +128,7 @@ public class BookingServiceImpl implements BookingService {
         );
     }
 
-    @Override
+   @Override
     @Transactional
     public void cancelBooking(Integer bookingId, String cancelReason) {
         Booking booking = bookingRepository.findById(bookingId)
@@ -144,17 +144,14 @@ public class BookingServiceImpl implements BookingService {
 
         booking.setStatus("CANCELED");
         bookingRepository.save(booking);
-    }
 
-    private RoomDTO toRoomDto(Room room) {
-        return new RoomDTO(
-                room.getId(),
-                room.getRoomNumber(),
-                room.getFloor(),
-                room.getStatus(),
-                room.getRoomType() != null ? room.getRoomType().getId() : null,
-                room.getRoomType() != null ? room.getRoomType().getName() : null,
-                room.getRoomType() != null ? room.getRoomType().getBasePrice() : null
-        );
+        List<BookingDetail> details = bookingDetailRepository.findByBookingId(bookingId);
+        for (BookingDetail detail : details) {
+            Room room = detail.getRoom();
+            if (room != null) {
+
+                room.setStatus("AVAILABLE"); 
+                roomRepository.save(room);
+            }
+        }
     }
-}
