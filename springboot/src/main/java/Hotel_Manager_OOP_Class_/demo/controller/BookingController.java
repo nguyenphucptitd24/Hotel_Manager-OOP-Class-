@@ -1,51 +1,62 @@
 package Hotel_Manager_OOP_Class_.demo.controller;
 
-import Hotel_Manager_OOP_Class_.demo.dto.BookingRequest;
-import Hotel_Manager_OOP_Class_.demo.entity.Booking;
-import Hotel_Manager_OOP_Class_.demo.entity.Room;
+import Hotel_Manager_OOP_Class_.demo.dto.BookingResponseDTO;
+import Hotel_Manager_OOP_Class_.demo.dto.CreateBookingRequest;
+import Hotel_Manager_OOP_Class_.demo.dto.RoomDTO;
 import Hotel_Manager_OOP_Class_.demo.service.BookingService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/bookings")
+@RequestMapping("/api/v1/bookings")
 @CrossOrigin(origins = "*")
+@RequiredArgsConstructor
 public class BookingController {
 
-    @Autowired
-    private BookingService bookingService;
+    private final BookingService bookingService;
 
     @GetMapping("/available-rooms")
-    public ResponseEntity<List<Room>> getAvailableRooms(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkIn,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOut,
-            @RequestParam(required = false) String roomType) {
-        List<Room> rooms = bookingService.findAvailableRooms(checkIn, checkOut, roomType);
+    public ResponseEntity<List<RoomDTO>> getAvailableRooms(
+            @RequestParam LocalDateTime checkIn,
+            @RequestParam LocalDateTime checkOut,
+            @RequestParam(required = false) Integer roomTypeId
+    ) {
+
+        List<RoomDTO> rooms = bookingService.getAvailableRooms(
+                checkIn,
+                checkOut,
+                roomTypeId
+        );
+
         return ResponseEntity.ok(rooms);
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<?> createBooking(@RequestBody BookingRequest request) {
-        try {
-            Booking booking = bookingService.createBooking(request);
-            return ResponseEntity.ok(booking);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    @PostMapping
+    public ResponseEntity<BookingResponseDTO> createBooking(
+            @RequestBody CreateBookingRequest request
+    ) {
+
+        BookingResponseDTO response =
+                bookingService.createBooking(request);
+
+        return ResponseEntity.ok(response);
     }
 
+
     @PutMapping("/{bookingId}/cancel")
-    public ResponseEntity<?> cancelBooking(@PathVariable Long bookingId) {
-        try {
-            Booking cancelledBooking = bookingService.cancelBooking(bookingId);
-            return ResponseEntity.ok(cancelledBooking);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<String> cancelBooking(
+            @PathVariable Integer bookingId,
+            @RequestParam(required = false) String reason
+    ) {
+
+        bookingService.cancelBooking(bookingId, reason);
+
+        return ResponseEntity.ok(
+                "Hủy đơn đặt phòng thành công!"
+        );
     }
 }
