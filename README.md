@@ -139,3 +139,17 @@ Trang **Customer Management** cung cấp:
 - Phân trang danh sách khách hàng.
 - Xem lịch sử đặt phòng của từng khách hàng.
 - Hiển thị lịch sử booking trong popup.
+## 6 Phân hệ Lễ tân & Dashboard (Reception & Analytics)
+
+### 6.1. Reception Module (Quản lý Lễ tân)
+* **DTO**: `CheckInRequestDTO` (nhận `bookingId`, `roomId`, `note`)
+* **API Endpoints**:
+  * `POST /api/v1/reception/check-in` - Thực hiện check-in cho khách
+  * `POST /api/v1/reception/check-out/{id}` - Thực hiện check-out và chuyển phòng sang dọn dẹp
+  * `POST /api/v1/reception/clean-complete/{id}` - Hoàn tất dọn dẹp, sẵn sàng đón khách
+
+### 6.2. Dashboard & Analytics Module (Báo cáo & Thống kê)
+* **DTO**: `DashboardDTO` & `MonthlyRevenueDTO`
+* **API Endpoints**:
+  * `GET /api/v1/analytics/dashboard` - Báo cáo doanh thu, tỷ lệ lấp đầy, tỷ lệ hủy phòng và biểu đồ theo tháng
+  
