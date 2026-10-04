@@ -1,8 +1,8 @@
-package Hotel_Manager_OOP_Class.demo.service;
+package Hotel_Manager_OOP_Class_.demo.service;
 
-import Hotel_Manager_OOP_Class.demo.dto.DashboardDTO;
-import Hotel_Manager_OOP_Class.demo.repository.BookingRepository;
-import Hotel_Manager_OOP_Class.demo.repository.RoomRepository;
+import Hotel_Manager_OOP_Class_.demo.dto.DashboardDTO;
+import Hotel_Manager_OOP_Class_.demo.repository.BookingRepository;
+import Hotel_Manager_OOP_Class_.demo.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
