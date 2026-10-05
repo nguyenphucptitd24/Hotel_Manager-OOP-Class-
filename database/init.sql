@@ -108,7 +108,6 @@ BULK INSERT room_types
 FROM '/data/room_types_import.csv'
 WITH (
     FORMAT = 'CSV',
-    CODEPAGE = '65001',
     FIRSTROW = 2,
     FIELDTERMINATOR = ',',
     ROWTERMINATOR = '0x0a',
@@ -119,7 +118,6 @@ BULK INSERT rooms
 FROM '/data/rooms_import.csv'
 WITH (
     FORMAT = 'CSV',
-    CODEPAGE = '65001',
     FIRSTROW = 2,
     FIELDTERMINATOR = ',',
     ROWTERMINATOR = '0x0a',
@@ -130,7 +128,6 @@ BULK INSERT customers
 FROM '/data/customers_import.csv'
 WITH (
     FORMAT = 'CSV',
-    CODEPAGE = '65001',
     FIRSTROW = 2,
     FIELDTERMINATOR = ',',
     ROWTERMINATOR = '0x0a',
@@ -141,7 +138,6 @@ BULK INSERT bookings
 FROM '/data/bookings_import.csv'
 WITH (
     FORMAT = 'CSV',
-    CODEPAGE = '65001',
     FIRSTROW = 2,
     FIELDTERMINATOR = ',',
     ROWTERMINATOR = '0x0a',
@@ -152,7 +148,6 @@ BULK INSERT booking_details
 FROM '/data/booking_details_import.csv'
 WITH (
     FORMAT = 'CSV',
-    CODEPAGE = '65001',
     FIRSTROW = 2,
     FIELDTERMINATOR = ',',
     ROWTERMINATOR = '0x0a',

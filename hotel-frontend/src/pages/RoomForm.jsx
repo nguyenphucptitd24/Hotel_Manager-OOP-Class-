@@ -75,21 +75,22 @@ function RoomForm({ room, roomTypes, onSuccess, onCancel }) {
     };
 
     return (
-        <div className="room-form">
+        <div className="room-form-panel">
+            <div className="room-form-header">
+                <h3>{room ? `Sửa thông tin phòng ${room.roomNumber}` : "Thêm phòng mới"}</h3>
+                <button type="button" className="btn-close-form" onClick={onCancel}>
+                    Đóng
+                </button>
+            </div>
 
-            <h2>
-                {room ? "Sửa phòng" : "Thêm phòng"}
-            </h2>
+            {error && <div className="room-form-error">{error}</div>}
 
-            {error && <div style={{ color: "red", marginBottom: "10px" }}>{error}</div>}
-
-            <form onSubmit={handleSubmit}>
-
-                <div>
+            <form onSubmit={handleSubmit} className="room-form-grid">
+                <div className="form-field">
                     <label>Số phòng</label>
-
                     <input
                         type="text"
+                        placeholder="Ví dụ: 101"
                         value={roomNumber}
                         onChange={(e) => {
                             setRoomNumber(e.target.value);
@@ -100,11 +101,13 @@ function RoomForm({ room, roomTypes, onSuccess, onCancel }) {
                     />
                 </div>
 
-                <div>
-                    <label>Tầng</label>
-
+                <div className="form-field">
+                    <label>Tầng (1 - 10)</label>
                     <input
                         type="number"
+                        min="1"
+                        max="10"
+                        placeholder="Ví dụ: 1"
                         value={floor}
                         onChange={(e) => {
                             setFloor(e.target.value);
@@ -115,34 +118,8 @@ function RoomForm({ room, roomTypes, onSuccess, onCancel }) {
                     />
                 </div>
 
-                <div>
-                    <label>Trạng thái</label>
-
-                    <select
-                        value={status}
-                        onChange={(e) => {
-                            setStatus(e.target.value);
-                            setError("");
-                        }}
-                        disabled={loading}
-                    >
-                        <option value="AVAILABLE">
-                            AVAILABLE
-                        </option>
-
-                        <option value="OCCUPIED">
-                            OCCUPIED
-                        </option>
-
-                        <option value="CLEANING">
-                            CLEANING
-                        </option>
-                    </select>
-                </div>
-
-                <div>
+                <div className="form-field">
                     <label>Loại phòng</label>
-
                     <select
                         value={roomTypeId}
                         onChange={(e) => {
@@ -152,35 +129,44 @@ function RoomForm({ room, roomTypes, onSuccess, onCancel }) {
                         disabled={loading}
                         required
                     >
-                        <option value="">
-                            -- Chọn loại phòng --
-                        </option>
-
+                        <option value="">-- Chọn loại phòng --</option>
                         {roomTypes.map((type) => (
-                            <option
-                                key={type.id}
-                                value={type.id}
-                            >
+                            <option key={type.id} value={type.id}>
                                 {type.name}
                             </option>
                         ))}
                     </select>
                 </div>
 
-                <br />
+                <div className="form-field">
+                    <label>Trạng thái ban đầu</label>
+                    <select
+                        value={status}
+                        onChange={(e) => {
+                            setStatus(e.target.value);
+                            setError("");
+                        }}
+                        disabled={loading}
+                    >
+                        <option value="AVAILABLE">AVAILABLE (Trống)</option>
+                        <option value="OCCUPIED">OCCUPIED (Có khách)</option>
+                        <option value="CLEANING">CLEANING (Dọn dẹp)</option>
+                    </select>
+                </div>
 
-                <button type="submit" disabled={loading}>
-                    {loading ? "Đang lưu..." : (room ? "Cập nhật" : "Thêm phòng")}
-                </button>
-
-                <button
-                    type="button"
-                    onClick={onCancel}
-                    disabled={loading}
-                >
-                    Hủy
-                </button>
-
+                <div className="form-actions">
+                    <button type="submit" className="btn-save" disabled={loading}>
+                        {loading ? "Đang lưu..." : (room ? "Cập nhật phòng" : "Lưu phòng")}
+                    </button>
+                    <button
+                        type="button"
+                        className="btn-cancel"
+                        onClick={onCancel}
+                        disabled={loading}
+                    >
+                        Hủy
+                    </button>
+                </div>
             </form>
         </div>
     );

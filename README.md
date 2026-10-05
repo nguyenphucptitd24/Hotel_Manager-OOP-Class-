@@ -137,5 +137,24 @@ Trang **Customer Management** cung cấp:
 - Tìm kiếm khách hàng theo nhiều tiêu chí.
 - Hiển thị danh sách khách hàng dạng bảng.
 - Phân trang danh sách khách hàng.
-- Xem lịch sử đặt phòng của từng khách hàng.
 - Hiển thị lịch sử booking trong popup.
+
+## 6 Phân hệ Lễ tân & Dashboard (Reception & Analytics)
+
+### 6.1. Reception Module (Quản lý Lễ tân)
+* **DTO**: `CheckInRequestDTO` (nhận `bookingId`, `roomId`, `note`)
+* **API Endpoints**:
+  * `POST /api/v1/reception/check-in` - Thực hiện check-in cho khách (nhận `CheckInRequestDTO` hoặc check-in theo đơn)
+  * `POST /api/v1/reception/check-in/{id}` - Thực hiện check-in nhanh theo mã đơn (`bookingId`)
+  * `POST /api/v1/reception/check-out/{id}` - Thực hiện check-out và chuyển phòng sang dọn dẹp (`CLEANING`)
+  * `POST /api/v1/reception/clean-complete/{id}` - Hoàn tất dọn dẹp, chuyển phòng về sẵn sàng đón khách (`AVAILABLE`)
+  * `GET /api/v1/reception/bookings` - Danh sách các đơn đặt phòng hoạt động phục vụ thao tác lễ tân tại quầy
+
+### 6.2. Dashboard & Analytics Module (Báo cáo & Thống kê)
+* **DTO**: `DashboardDTO` & `MonthlyRevenueDTO`
+* **API Endpoints**:
+  * `GET /api/v1/analytics/dashboard` - Báo cáo tổng doanh thu, tỷ lệ lấp đầy (`occupancyRate`), tỷ lệ hủy phòng (`cancellationRate`), số lượng booking và biểu đồ phân tích theo tháng (`monthlyRevenue`)
+
+### 6.3. Frontend Screens
+* **Trang Lễ tân (`ReceptionPage.jsx`)**: Bảng thao tác nhanh check-in, check-out, báo dọn phòng hoàn tất, và popup nhập ghi chú lễ tân.
+* **Trang Dashboard (`DashboardPage.jsx`)**: Các thẻ KPI chỉ số chính, biểu đồ doanh thu theo tháng (Bar Chart), biểu đồ phân bổ tỷ lệ hoàn tất/hủy (Donut Chart) và bảng chi tiết doanh số.

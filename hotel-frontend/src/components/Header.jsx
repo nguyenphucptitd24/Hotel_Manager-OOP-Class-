@@ -34,6 +34,24 @@ function Header({ activeView, isAdmin, isStaff, onChangeView, onLogout }) {
                     </button>
                 )}
 
+                {(isAdmin || isStaff) && (
+                    <button
+                        className={activeView === "reception" ? "active" : ""}
+                        onClick={() => onChangeView("reception")}
+                    >
+                        Lễ tân
+                    </button>
+                )}
+
+                {(isAdmin || isStaff) && (
+                    <button
+                        className={activeView === "dashboard" ? "active" : ""}
+                        onClick={() => onChangeView("dashboard")}
+                    >
+                        Dashboard
+                    </button>
+                )}
+
                 <button onClick={handleLogout}>
                     Đăng xuất
                 </button>

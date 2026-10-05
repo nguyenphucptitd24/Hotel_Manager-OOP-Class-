@@ -3,6 +3,8 @@ import Login from "./pages/Login";
 import RoomMatrix from "./pages/RoomMatrix";
 import RoomTypeManager from "./pages/RoomTypeManager";
 import CustomerManagement from "./pages/CustomerManagement";
+import ReceptionPage from "./pages/ReceptionPage";
+import DashboardPage from "./pages/DashboardPage";
 import Header from "./components/Header";
 
 function decodeJwtPayload(token) {
@@ -69,6 +71,10 @@ function App() {
                 <RoomTypeManager />
             ) : activeView === "customers" && (isAdmin || isStaff) ? (
                 <CustomerManagement />
+            ) : activeView === "reception" && (isAdmin || isStaff) ? (
+                <ReceptionPage />
+            ) : activeView === "dashboard" && (isAdmin || isStaff) ? (
+                <DashboardPage />
             ) : (
                 <RoomMatrix role={role} />
             )}
