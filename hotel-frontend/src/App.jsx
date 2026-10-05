@@ -1,44 +1,79 @@
-import React, { useState } from 'react';
-import ReceptionPage from './ReceptionPage';
-import DashboardPage from './DashboardPage';
+import { useState } from "react";
+import Login from "./pages/Login";
+import RoomMatrix from "./pages/RoomMatrix";
+import RoomTypeManager from "./pages/RoomTypeManager";
+import CustomerManagement from "./pages/CustomerManagement";
+import Header from "./components/Header";
+
+function decodeJwtPayload(token) {
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const paddedBase64 = base64.padEnd(base64.length + (4 - base64.length % 4) % 4, "=");
+    return JSON.parse(atob(paddedBase64));
+}
+
+function getCurrentUserRole() {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        return null;
+    }
+
+    try {
+        const payload = decodeJwtPayload(token);
+        const role = payload.role ?? payload.authorities?.[0] ?? null;
+
+        if (typeof role === "string") {
+            return role.replace(/^ROLE_/, "").toUpperCase();
+        }
+
+        if (role?.authority) {
+            return role.authority.replace(/^ROLE_/, "").toUpperCase();
+        }
+
+        return null;
+    } catch (error) {
+        console.error("Error parsing JWT token:", error);
+        return null;
+    }
+}
 
 function App() {
-  const [tab, setTab] = useState('reception');
+    const [isLoggedIn, setIsLoggedIn] = useState(
+        !!localStorage.getItem("token")
+    );
+    const [activeView, setActiveView] = useState("rooms");
 
-  return (
-    <div>
-      <div style={{ backgroundColor: '#1a237e', padding: '12px 24px', display: 'flex', gap: '16px' }}>
-        <button 
-          onClick={() => setTab('reception')}
-          style={{ 
-            padding: '8px 16px', 
-            border: 'none', 
-            borderRadius: '4px', 
-            cursor: 'pointer', 
-            fontWeight: 'bold', 
-            backgroundColor: tab === 'reception' ? '#fff' : 'transparent', 
-            color: tab === 'reception' ? '#1a237e' : '#fff' 
-          }}>
-          📋 Nghiệp Vụ Lễ Tân
-        </button>
-        <button 
-          onClick={() => setTab('dashboard')}
-          style={{ 
-            padding: '8px 16px', 
-            border: 'none', 
-            borderRadius: '4px', 
-            cursor: 'pointer', 
-            fontWeight: 'bold', 
-            backgroundColor: tab === 'dashboard' ? '#fff' : 'transparent', 
-            color: tab === 'dashboard' ? '#1a237e' : '#fff' 
-          }}>
-          📊 Dashboard Báo Cáo
-        </button>
-      </div>
+    if (!isLoggedIn) {
+        return <Login onLogin={() => setIsLoggedIn(true)} />;
+    }
 
-      {tab === 'reception' ? <ReceptionPage /> : <DashboardPage />}
-    </div>
-  );
+    const role = getCurrentUserRole();
+    const isAdmin = role === "ADMIN";
+    const isStaff = role === "STAFF";
+
+    return (
+        <>
+            <Header
+                activeView={activeView}
+                isAdmin={isAdmin}
+                isStaff={isStaff}
+                onChangeView={setActiveView}
+                onLogout={() => {
+                    setActiveView("rooms");
+                    setIsLoggedIn(false);
+                }}
+            />
+
+            {activeView === "room-types" && isAdmin ? (
+                <RoomTypeManager />
+            ) : activeView === "customers" && (isAdmin || isStaff) ? (
+                <CustomerManagement />
+            ) : (
+                <RoomMatrix role={role} />
+            )}
+        </>
+    );
 }
 
 export default App;
