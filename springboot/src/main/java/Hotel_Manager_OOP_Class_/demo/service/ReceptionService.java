@@ -1,10 +1,10 @@
-package Hotel_Manager_OOP_Class_.demo.service;
+package Hotel_Manager_OOP_Class.demo.service;
 
-import Hotel_Manager_OOP_Class_.demo.dto.CheckInRequestDTO;
-import Hotel_Manager_OOP_Class_.demo.entity.Booking;
-import Hotel_Manager_OOP_Class_.demo.entity.Room;
-import Hotel_Manager_OOP_Class_.demo.repository.BookingRepository;
-import Hotel_Manager_OOP_Class_.demo.repository.RoomRepository;
+import Hotel_Manager_OOP_Class.demo.dto.CheckInRequestDTO;
+import Hotel_Manager_OOP_Class.demo.entity.Booking;
+import Hotel_Manager_OOP_Class.demo.entity.Room;
+import Hotel_Manager_OOP_Class.demo.repository.BookingRepository;
+import Hotel_Manager_OOP_Class.demo.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +47,7 @@ public class ReceptionService {
     }
 
     @Transactional
-    public Booking checkOut(Integer bookingId) {
+    public Booking checkOut(Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy thông tin đặt phòng!"));
 
@@ -60,14 +60,5 @@ public class ReceptionService {
         booking.setStatus("CHECKED_OUT");
         booking.setCheckOutDate(LocalDateTime.now());
         return bookingRepository.save(booking);
-    }
-
-    @Transactional
-    public Room cleanComplete(Integer roomId) {
-        Room room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy phòng!"));
-
-        room.setStatus("AVAILABLE");
-        return roomRepository.save(room);
     }
 }
