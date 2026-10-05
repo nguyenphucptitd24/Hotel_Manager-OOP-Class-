@@ -152,3 +152,4 @@ Trang **Customer Management** cung cấp:
 * **DTO**: `DashboardDTO` & `MonthlyRevenueDTO`
 * **API Endpoints**:
   * `GET /api/v1/analytics/dashboard` - Báo cáo doanh thu, tỷ lệ lấp đầy, tỷ lệ hủy phòng và biểu đồ theo tháng
+  
