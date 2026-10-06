@@ -1,0 +1,92 @@
+.room-type-page {
+    padding: 25px 30px;
+    text-align: left;
+}
+
+.room-type-layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.room-type-form {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.room-type-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14px;
+}
+
+.room-type-form input,
+.room-type-form textarea {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font: inherit;
+}
+
+.form-error {
+    padding: 10px 12px;
+    border-radius: 6px;
+    color: #9f1239;
+    background: #ffe4e6;
+    border: 1px solid #fecdd3;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.room-type-form button,
+.room-type-table button {
+    padding: 9px 13px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.room-type-table-wrap {
+    overflow-x: auto;
+}
+
+.room-type-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg);
+}
+
+.room-type-table th,
+.room-type-table td {
+    border-bottom: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.room-type-table th {
+    color: var(--text-h);
+}
+
+.room-type-table td:last-child {
+    white-space: nowrap;
+}
+
+.room-type-table td:last-child button {
+    margin-right: 8px;
+}
+
+@media (max-width: 900px) {
+    .room-type-layout {
+        grid-template-columns: 1fr;
+    }
+}
