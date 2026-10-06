@@ -16,5 +16,7 @@ public interface ReceptionService {
 
     ReceptionResponseDTO cleanComplete(Integer roomId);
 
+    ReceptionResponseDTO deleteBooking(Integer bookingId);
+
     List<ReceptionBookingDTO> getActiveReceptionBookings();
 }

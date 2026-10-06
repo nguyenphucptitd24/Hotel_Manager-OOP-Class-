@@ -48,6 +48,13 @@ public class ReceptionController {
     }
 
     @All
+    @DeleteMapping("/bookings/{bookingId}")
+    public ResponseEntity<ReceptionResponseDTO> deleteBooking(@PathVariable Integer bookingId) {
+        ReceptionResponseDTO response = receptionService.deleteBooking(bookingId);
+        return ResponseEntity.ok(response);
+    }
+
+    @All
     @GetMapping("/bookings")
     public ResponseEntity<List<ReceptionBookingDTO>> getReceptionBookings() {
         List<ReceptionBookingDTO> list = receptionService.getActiveReceptionBookings();

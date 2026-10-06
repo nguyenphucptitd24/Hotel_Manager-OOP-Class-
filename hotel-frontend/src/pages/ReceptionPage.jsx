@@ -109,6 +109,17 @@ const ReceptionPage = () => {
         }
     };
 
+    const handleDeleteBooking = async (bookingId) => {
+        if (!bookingId) return;
+        try {
+            const res = await api.delete(`/api/v1/reception/bookings/${bookingId}`);
+            showMessage(res.data?.message || "Đã xóa đơn đặt phòng!", "success");
+            fetchBookings();
+        } catch (err) {
+            showMessage(err.response?.data?.message || "Không thể xóa đơn đặt phòng!", "error");
+        }
+    };
+
     const openCheckInModalForBooking = (b) => {
         setFormBookingId(b.bookingId);
         setFormRoomId(b.roomId || "");
@@ -228,10 +239,10 @@ const ReceptionPage = () => {
                                         <td>
                                             <span className={`status-tag status-${(b.status || "").toLowerCase()}`}>
                                                 {b.status === "CONFIRMED" ? "CONFIRMED (Đã xác nhận)" :
-                                                 b.status === "CHECKED_IN" ? "CHECKED_IN (Đang ở)" :
-                                                 b.status === "CLEANING" ? "CLEANING (Dọn dẹp)" :
-                                                 b.status === "COMPLETED" ? "COMPLETED (Hoàn tất)" :
-                                                 b.status === "CANCELED" || b.status === "CANCELLED" ? "CANCELED (Đã hủy)" : b.status}
+                                                    b.status === "CHECKED_IN" ? "CHECKED_IN (Đang ở)" :
+                                                        b.status === "CLEANING" ? "CLEANING (Dọn dẹp)" :
+                                                            b.status === "COMPLETED" ? "COMPLETED (Hoàn tất)" :
+                                                                b.status === "CANCELED" || b.status === "CANCELLED" ? "CANCELED (Đã hủy)" : b.status}
                                             </span>
                                         </td>
                                         <td className="actions-cell">
@@ -265,6 +276,14 @@ const ReceptionPage = () => {
                                                     onClick={() => handleCleanComplete(b.roomId)}
                                                 >
                                                     Đã dọn xong
+                                                </button>
+                                            )}
+                                            {(b.status === "COMPLETED" || b.status === "CANCELED" || b.status === "CANCELLED") && (
+                                                <button
+                                                    className="btn-tbl btn-tbl-delete"
+                                                    onClick={() => handleDeleteBooking(b.bookingId)}
+                                                >
+                                                    Xóa
                                                 </button>
                                             )}
                                         </td>

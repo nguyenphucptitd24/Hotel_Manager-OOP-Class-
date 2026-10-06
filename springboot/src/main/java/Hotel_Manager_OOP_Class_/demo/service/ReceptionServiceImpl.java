@@ -198,6 +198,42 @@ public class ReceptionServiceImpl implements ReceptionService {
     }
 
     @Override
+    @Transactional
+    public ReceptionResponseDTO deleteBooking(Integer bookingId) {
+        if (bookingId == null) {
+            throw new IllegalArgumentException("Mã đơn đặt phòng không được để trống!");
+        }
+
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn đặt phòng có ID: " + bookingId));
+
+        List<BookingDetail> details = bookingDetailRepository.findByBookingId(booking.getId());
+        List<String> roomNumbers = new ArrayList<>();
+
+        for (BookingDetail detail : details) {
+            Room room = detail.getRoom();
+            if (room != null) {
+                room.setStatus("AVAILABLE");
+                roomRepository.save(room);
+                roomNumbers.add(room.getRoomNumber());
+            }
+        }
+
+        if (!details.isEmpty()) {
+            bookingDetailRepository.deleteAll(details);
+        }
+
+        bookingRepository.delete(booking);
+
+        return ReceptionResponseDTO.builder()
+                .message("Đã xóa đơn " + booking.getBookingCode() + " và trả phòng về trạng thái trống.")
+                .bookingId(booking.getId())
+                .roomNumber(String.join(", ", roomNumbers))
+                .status("AVAILABLE")
+                .build();
+    }
+
+    @Override
     public List<ReceptionBookingDTO> getActiveReceptionBookings() {
         // Lấy danh sách booking mới nhất phục vụ màn hình lễ tân
         List<Booking> recentBookings = bookingRepository.findAll(
